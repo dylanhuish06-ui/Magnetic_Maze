@@ -25,10 +25,11 @@ export const LEVELS = [
     defaults: { field: 0.32, speed: 240, charge: 1 }, maxTime: 7,
   },
   {
-    id: 'reverse-field', number: '03', title: 'Reverse the field', difficulty: 'Bonus',
-    brief: 'The detector is below the beam. A positive ion in a positive field curves the wrong way. What can you reverse?',
-    concept: 'Changing the sign of either the field or the charge reverses the Lorentz force.',
-    hint: 'Try B near −1.0 with a positive ion, or reverse both B and charge.',
+    id: 'reverse-field', number: '03', title: 'Calculate the rescue', difficulty: 'Final calculation',
+    brief: 'No sliders this time. Use the given energy and target coordinates to calculate the launch speed and signed magnetic field, then enter both values to guide a positive ion to the detector.',
+    concept: 'For a horizontal launch, geometry determines the orbit radius; kinetic energy determines speed. The Lorentz force then fixes the required field magnitude and direction.',
+    hint: 'First find v from K = ½mv². Next calculate the radius of the circle passing through the target. Which sign of B bends a positive ion downward?',
+    calculation: { mass: 1, charge: 1, kineticEnergy: 28800, speedTolerance: 0.02 },
     world: WORLD, start: { x: 115, y: 150, angle: 0 },
     target: { x: 420, y: 415, radius: 24 },
     obstacles: [

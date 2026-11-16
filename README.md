@@ -2,7 +2,7 @@
 
 A zero-dependency, phone-friendly browser game introducing students to **charged-particle motion in a magnetic field**. Built for Durham University Nuclear Fusion Society (DUNFS) Session 1.
 
-Three missions: **Find the orbit**, **Reactor pass**, and **Reverse the field**. Change magnetic field magnitude and direction, particle speed, and charge to steer an ideal test particle through a detector without hitting the chamber walls.
+Three missions: **Find the orbit**, **Reactor pass**, and **Calculate the rescue**. The first two use interactive sliders for field strength and speed. **Mission 3 replaces both sliders with numerical input boxes**: students calculate launch speed from the supplied kinetic energy and signed magnetic field from the target's geometry before launching. Charge is fixed to +1 on the final stage.
 
 ## Run locally
 
@@ -23,7 +23,7 @@ Requires Node.js 20+:
 npm test
 ```
 
-Tests cover analytical gyro-orbits, conservation of speed, charge/field reversal, obstacle collisions, and solvability of all three levels.
+Tests cover analytical gyro-orbits, conservation of speed, charge/field reversal, obstacle collisions, all three solvable levels, and the final-stage kinetic-energy and geometric calculations.
 
 ## Publish to GitHub Pages
 
@@ -44,13 +44,13 @@ With `x` rightward, screen `y` downward, and positive magnetic field directed **
 
 `src/physics.js` integrates this exactly for a spatially uniform, time-independent magnetic field. Collision detection samples the trajectory at 2.5 px or smaller intervals. Positive ions initially moving right curve upward when B is positive, and their speed is conserved.
 
-The game uses illustrative field, mass, speed and distance units. It is **not** a realistic tokamak or self-consistent plasma simulation. The trajectory is an accurate example of the underlying ideal Lorentz-force model under the stated assumptions.
+The game uses illustrative field, mass, speed and distance units. The final calculation uses \(K=\tfrac12mv^2\), \(R=(\Delta x^2+\Delta y^2)/(2|\Delta y|)\) for the horizontal launch, and \(R=mv/(0.8|qB|)\). The signed field must bend the positive ion *downward* (negative B). The simulation checks that the submitted speed agrees with the given kinetic energy to within 2%, then uses the calculated field to simulate the trajectory. It is **not** a realistic tokamak or self-consistent plasma simulation. The trajectory is an accurate example of the underlying ideal Lorentz-force model under the stated assumptions.
 
 ## Session 1 format (8 minutes)
 
 - 2 min: Predict whether a stronger field bends the particle more or less.
 - 4 min: In groups, complete the first two missions.
-- 2 min: Explain results using the Larmor radius; attempt the reverse-field bonus.
+- 2 min: Calculate the final-stage speed and field from the supplied energy and geometry (allow extra time for this optional extension).
 
 An accompanying **[Remote Rescue](remote-rescue.html)** activity is provided for the ReMORA team, demonstrating open-loop versus closed-loop feedback control without blindfolded walking.
 

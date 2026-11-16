@@ -1,5 +1,6 @@
 import { LEVELS } from './levels.js';
 import { simulateFlight, larmorRadius } from './physics.js';
+import { isEnergyConsistent } from './calculation.js';
 
 const $ = id => document.getElementById(id);
 const canvas = $('view');
@@ -9,8 +10,22 @@ const best = (saved && typeof saved === 'object') ? saved : {};
 let current = 0, attempts = 0, revealedHint = false, flight = null, activeFrame = 0, raf = null, startedAt = null;
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-function settings() { return { field: Number($('field').value), speed: Number($('speed').value), charge: Number($('charge').value) }; }
 function selected() { return LEVELS[current]; }
+function isCalculation() { return Boolean(selected().calculation); }
+function enteredNumber(id) { const raw = $(id).value.trim(); return raw === '' ? NaN : Number(raw); }
+function settings() {
+  if (isCalculation()) return { field: enteredNumber('field-entry'), speed: enteredNumber('speed-entry'), charge: selected().calculation.charge };
+  return { field: Number($('field').value), speed: Number($('speed').value), charge: Number($('charge').value) };
+}
+function validateSettings() {
+  if (!isCalculation()) return null;
+  const { field, speed } = settings();
+  if (!Number.isFinite(field) || !Number.isFinite(speed)) return 'Enter both calculated numbers before launching.';
+  if (field < -2 || field > 2 || speed < 160 || speed > 320 || field === 0) return 'Enter a nonzero B from −2 to +2 and a speed from 160 to 320.';
+  const challenge = selected().calculation;
+  if (!isEnergyConsistent(speed, challenge.kineticEnergy, challenge.mass, challenge.speedTolerance)) return 'Your speed does not agree with the given kinetic energy. Calculate v = √(2K/m) and try again.';
+  return null;
+}
 function formatSigned(value, digits = 2) { return `${value >= 0 ? '+' : '−'}${Math.abs(value).toFixed(digits)}`; }
 
 function drawGrid() {
@@ -46,6 +61,13 @@ function draw() {
 function message(text, state='') { $('result').textContent=text;$('result').className=`result ${state}`; }
 function updateControls() {
   const {field,speed,charge}=settings();
+  if (isCalculation()) {
+    $('field-value').textContent='CALCULATED';
+    $('speed-value').textContent='CALCULATED';
+    $('readout').textContent=`B = ${Number.isFinite(field)?formatSigned(field,3):'—'}  ·  SPEED = ${Number.isFinite(speed)?speed:'—'}  ·  q = +1`;
+    $('radius').textContent='rL = calculate before launching';
+    return;
+  }
   $('field-value').textContent=formatSigned(field);
   $('speed-value').textContent=speed;
   $('readout').textContent=`B = ${formatSigned(field)}  ·  SPEED = ${speed}  ·  q = ${charge>0?'+1':'−1'}`;
@@ -69,8 +91,20 @@ function loadLevel(index) {
   $('mission-code').textContent=`MISSION ${level.number} / 03`;$('mission-title').textContent=level.title;
   $('difficulty').textContent=level.difficulty.toUpperCase();$('mission-brief').textContent=level.brief;
   $('concept').textContent=level.concept;$('field').value=level.defaults.field;$('speed').value=level.defaults.speed;$('charge').value=level.defaults.charge;
+  const calc = isCalculation();
+  $('calculation-card').hidden = !calc;
+  $('field').hidden = calc; $('speed').hidden = calc;
+  $('field-entry').hidden = !calc; $('speed-entry').hidden = !calc;
+  $('field-range-label').hidden = calc; $('speed-range-label').hidden = calc;
+  $('field-value').hidden = calc; $('speed-value').hidden = calc;
+  $('field-label').htmlFor = calc ? 'field-entry' : 'field';
+  $('speed-label').htmlFor = calc ? 'speed-entry' : 'speed';
+  $('field-entry').value = ''; $('speed-entry').value = '';
+  $('charge').disabled = calc;
+  $('fixed-charge-note').hidden = !calc;
   $('attempts').textContent='ATTEMPTS 0';$('hint').textContent='? SHOW HINT';$('canvas-status').textContent='READY TO LAUNCH';$('launch').disabled=false;
-  message('Make a prediction, adjust the controls, and launch your particle.');updateControls();updateScore();draw();
+  message(calc ? 'Use the mission data to calculate v and B. Enter both numbers before launching.' : 'Make a prediction, adjust the controls, and launch your particle.');
+  updateControls();updateScore();draw();
 }
 function finish() {
   $('launch').disabled=false;
@@ -79,7 +113,7 @@ function finish() {
     const score=Math.max(30,100-12*(attempts-1))+(revealedHint?0:25);
     if(score>(Number(best[selected().id])||0)){best[selected().id]=score;persist();updateScore();}
     message(`✓ Target reached! ${score} points this run. ${attempts===1?'First-try success!':'Nice correction.'} Choose another mission below.`, 'success');
-  } else message(`${outcome.label} Adjust the field or launch speed and try again.`, 'fail');
+  } else message(`${outcome.label} ${isCalculation()?'Review your geometry and field calculation, then try again.':'Adjust the field or launch speed and try again.'}`, 'fail');
 }
 function animate(timestamp) {
   if(startedAt===null)startedAt=timestamp;
@@ -89,13 +123,17 @@ function animate(timestamp) {
   if(activeFrame >= flight.frames.length-1){stopAnimation();finish();}else raf=requestAnimationFrame(animate);
 }
 function launch() {
+  const error = validateSettings();
+  if (error) { message(error, 'fail'); return; }
   stopAnimation();attempts++;$('attempts').textContent=`ATTEMPTS ${attempts}`;
-  flight=simulateFlight(selected(),settings());activeFrame=0;$('launch').disabled=true;
+  const values = settings();
+  flight=simulateFlight(selected(),values);activeFrame=0;$('launch').disabled=true;
+  if (isCalculation()) $('radius').textContent=`rL = ${larmorRadius(values.speed,values.field,values.charge).toFixed(1)} px (after launch)`;
   $('canvas-status').textContent='PARTICLE IN FLIGHT';message('Tracking the particle through the chamber…');
   if(prefersReducedMotion) {activeFrame=flight.frames.length-1;draw();finish();}
   else raf=requestAnimationFrame(animate);
 }
-for(const key of ['field','speed','charge']) $(key).addEventListener('input',updateControls);
+for(const key of ['field','speed','charge','field-entry','speed-entry']) $(key).addEventListener('input',updateControls);
 $('launch').addEventListener('click',launch);
 $('reset').addEventListener('click',()=>loadLevel(current));
 $('hint').addEventListener('click',()=>{revealedHint=true;$('hint').textContent='HINT SHOWN';message(`Hint: ${selected().hint}`);});

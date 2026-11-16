@@ -34,12 +34,26 @@
         </section>
         <aside class="controls" aria-label="Simulation controls">
           <div class="control-header"><span class="eyebrow">THE CONTROL ROOM</span><span class="counter" id="attempts">ATTEMPTS 0</span></div>
-          <div class="control-group"><label for="field">Magnetic field <span id="field-value">+0.55</span></label><input id="field" type="range" min="-2" max="2" step="0.05" value="0.55"><div class="range-label"><span>−2.0</span><span>0</span><span>+2.0</span></div></div>
-          <div class="control-group"><label for="speed">Launch speed <span id="speed-value">240</span></label><input id="speed" type="range" min="160" max="320" step="10" value="240"><div class="range-label"><span>160</span><span>240</span><span>320</span></div></div>
-          <div class="control-group"><label for="charge">Particle charge</label><select id="charge"><option value="1">Positive ion (+)</option><option value="-1">Negative particle (−)</option></select></div>
+          <div id="calculation-card" class="calculation-card" hidden>
+            <span class="eyebrow">FINAL MISSION · NO SLIDERS</span>
+            <p>Calculate your launch settings before you fire. The particle launches horizontally to the right, towards a detector below it.</p>
+            <div class="calculation-grid">
+              <div>Mass <strong>m = 1</strong></div>
+              <div>Charge <strong>q = +1</strong></div>
+              <div>Kinetic energy <strong>K = 28,800</strong></div>
+              <div>To detector <strong>Δx = +305</strong></div>
+              <div>To detector <strong>Δy = +265 ↓</strong></div>
+              <div>Field conversion <strong>k = 0.8</strong></div>
+            </div>
+            <p class="calc-note">All values use illustrative game units. Screen +y points down. Compute <strong>v</strong> from the kinetic energy, then the required orbit radius <strong>R</strong> from the geometry, and finally signed <strong>B</strong>. Round B to three decimals.</p>
+            <div class="working-formulas">v = √(2K/m)<br>R = (Δx² + Δy²) / (2|Δy|)<br>R = mv / (k|qB|)</div>
+          </div>
+          <div class="control-group"><label for="field" id="field-label">Magnetic field <span id="field-value">+0.55</span></label><input id="field" type="range" min="-2" max="2" step="0.05" value="0.55"><input id="field-entry" class="number-entry" type="number" inputmode="decimal" min="-2" max="2" step="any" placeholder="Enter signed B" autocomplete="off" hidden><div class="range-label" id="field-range-label"><span>−2.0</span><span>0</span><span>+2.0</span></div></div>
+          <div class="control-group"><label for="speed" id="speed-label">Launch speed <span id="speed-value">240</span></label><input id="speed" type="range" min="160" max="320" step="10" value="240"><input id="speed-entry" class="number-entry" type="number" inputmode="decimal" min="160" max="320" step="any" placeholder="Enter calculated speed" autocomplete="off" hidden><div class="range-label" id="speed-range-label"><span>160</span><span>240</span><span>320</span></div></div>
+          <div class="control-group"><label for="charge">Particle charge</label><select id="charge"><option value="1">Positive ion (+)</option><option value="-1">Negative particle (−)</option></select><small id="fixed-charge-note" class="control-note" hidden>Fixed at q = +1 for the calculation challenge.</small></div>
           <button id="launch" class="primary-btn"><span>LAUNCH PARTICLE</span><span aria-hidden="true">↗</span></button>
           <div class="button-row"><button id="reset" class="secondary-btn">↺ RESET</button><button id="hint" class="secondary-btn">? SHOW HINT</button></div>
-          <div class="teaching-card"><span class="eyebrow">THE PHYSICS</span><p id="concept">A magnetic field bends the path of a moving charge.</p><div class="formula">r<sub>L</sub> = mv<sub>⊥</sub> / |q|B</div><small>The chamber uses illustrative units. Only the trajectory follows the ideal Lorentz-force model; it is not a full plasma simulation.</small></div>
+          <div class="teaching-card"><span class="eyebrow">THE PHYSICS</span><p id="concept">A magnetic field bends the path of a moving charge.</p><div class="formula">r<sub>L</sub> = mv<sub>⊥</sub> / |qB|</div><small>The chamber uses illustrative units. Only the trajectory follows the ideal Lorentz-force model; it is not a full plasma simulation.</small></div>
         </aside>
       </div>
       <section class="missions" aria-label="Mission selector"><div class="section-title"><span class="eyebrow">CHOOSE A MISSION</span><span>Complete all three to earn the FusionSim badge.</span></div><div id="level-list" class="level-list"></div></section>
