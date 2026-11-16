@@ -1,0 +1,13 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { advanceParticle, angularFrequency, kineticSpeed, larmorRadius, simulateFlight, detectOutcome } from '../src/physics.js';
+import { LEVELS } from '../src/levels.js';
+const close=(a,b,tol=1e-9)=>assert.ok(Math.abs(a-b)<=tol,String(a)+' != '+String(b));
+test('B=0 gives a straight line',()=>{const p=advanceParticle({x:20,y:15,vx:4,vy:-2},2,0);close(p.x,28);close(p.y,11);close(p.vx,4);close(p.vy,-2);});
+test('magnetic force conserves particle speed',()=>{let p={x:10,y:10,vx:110,vy:45};for(let i=0;i<5000;i++)p=advanceParticle(p,.002,1.3);close(kineticSpeed(p),Math.hypot(110,45),1e-9);});
+test('full gyroperiod returns particle to start',()=>{const p0={x:50,y:120,vx:150,vy:30};const T=2*Math.PI/angularFrequency(1.2);const p=advanceParticle(p0,T,1.2);close(p.x,p0.x);close(p.y,p0.y);close(p.vx,p0.vx);close(p.vy,p0.vy);});
+test('positive ion deflects upward and reversing B or q reverses it',()=>{const p={x:100,y:200,vx:240,vy:0};assert.ok(advanceParticle(p,.3,1).y<200);assert.ok(advanceParticle(p,.3,-1).y>200);close(advanceParticle(p,.3,-1).y,advanceParticle(p,.3,1,-1).y);});
+test('radius scales inversely with B and directly with speed',()=>{close(larmorRadius(200,2),larmorRadius(200,1)/2);close(larmorRadius(300,1),larmorRadius(150,1)*2);assert.equal(larmorRadius(100,0),Infinity);});
+test('invalid numerical parameters are rejected',()=>{assert.throws(()=>angularFrequency(1,1,0),RangeError);assert.throws(()=>advanceParticle({x:1,y:1,vx:1,vy:1},-1,1),RangeError);});
+test('a collision with an obstacle is detected',()=>{const l={world:{width:900,height:540},target:{x:850,y:400,radius:10},obstacles:[{x:200,y:200,width:50,height:50}]};assert.equal(detectOutcome({x:202,y:205},l).kind,'collision');});
+test('all three levels are solvable with advertised hint settings',()=>{for(const [index,field] of [1.1,.72,-.98].entries()){const outcome=simulateFlight(LEVELS[index],{field,speed:240,charge:1}).outcome;assert.equal(outcome.kind,'success',LEVELS[index].id+': '+outcome.kind);}});

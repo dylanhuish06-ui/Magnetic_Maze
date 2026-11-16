@@ -1,0 +1,14 @@
+{
+  "name": "dunfs-magnetic-maze",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A dependency-free Lorentz-force browser challenge for DUNFS Session 1",
+  "scripts": {
+    "test": "node --test",
+    "dev": "python3 -m http.server 8000"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

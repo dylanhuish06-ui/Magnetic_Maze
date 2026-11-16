@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#201536">
+  <meta name="description" content="Magnetic Maze: steer a charged particle using the Lorentz force. A DUNFS FusionSim workshop game.">
+  <title>Magnetic Maze · DUNFS</title>
+  <link rel="stylesheet" href="./style.css">
+  <script type="module" src="./src/game.js"></script>
+</head>
+<body>
+  <div class="site-wrap">
+    <header class="topbar">
+      <div class="brand"><span class="brand-icon" aria-hidden="true">◉</span><span><strong>DUNFS</strong><small>FUSIONSIM LAB</small></span></div>
+      <div class="topbar-right"><span class="pill" id="best-label">TOTAL SCORE · 0</span><a href="./remote-rescue.html" class="muted-link">ReMORA workshop ↗</a></div>
+    </header>
+    <main>
+      <div class="hero">
+        <div><div class="eyebrow">SESSION 01 <span class="dot">✦</span> PLASMA CHALLENGE</div><h1>MAGNETIC<br><em>MAZE.</em></h1><p>One charged particle. One magnetic field. One target.<br>Use physics to find the right trajectory.</p></div>
+        <div class="science-mark" aria-hidden="true"><div class="orbit orbit-a"></div><div class="orbit orbit-b"></div><div class="core"></div></div>
+      </div>
+      <div class="layout">
+        <section class="game-panel" aria-labelledby="mission-title">
+          <div class="panel-head"><div><span class="eyebrow" id="mission-code">MISSION 01 / 03</span><h2 id="mission-title">Find the orbit</h2></div><div class="difficulty" id="difficulty">TRAINING</div></div>
+          <p id="mission-brief" class="brief"></p>
+          <div class="viewport-wrap">
+            <canvas id="view" width="900" height="540" aria-label="Simulation chamber with launch point, target, and obstacles" role="img"></canvas>
+            <div class="canvas-label top-left">CHAMBER VIEW <span>·</span> XY PLANE</div>
+            <div class="canvas-label bottom-right" id="canvas-status">READY TO LAUNCH</div>
+          </div>
+          <div class="sim-footer"><span id="readout">B = +0.55 · SPEED = 240 · q = +1</span><span id="radius">r<sub>L</sub> = 545.5 px</span></div>
+          <p class="result" id="result" role="status" aria-live="polite">Adjust the controls, make a prediction, then launch your particle.</p>
+        </section>
+        <aside class="controls" aria-label="Simulation controls">
+          <div class="control-header"><span class="eyebrow">THE CONTROL ROOM</span><span class="counter" id="attempts">ATTEMPTS 0</span></div>
+          <div class="control-group"><label for="field">Magnetic field <span id="field-value">+0.55</span></label><input id="field" type="range" min="-2" max="2" step="0.05" value="0.55"><div class="range-label"><span>−2.0</span><span>0</span><span>+2.0</span></div></div>
+          <div class="control-group"><label for="speed">Launch speed <span id="speed-value">240</span></label><input id="speed" type="range" min="160" max="320" step="10" value="240"><div class="range-label"><span>160</span><span>240</span><span>320</span></div></div>
+          <div class="control-group"><label for="charge">Particle charge</label><select id="charge"><option value="1">Positive ion (+)</option><option value="-1">Negative particle (−)</option></select></div>
+          <button id="launch" class="primary-btn"><span>LAUNCH PARTICLE</span><span aria-hidden="true">↗</span></button>
+          <div class="button-row"><button id="reset" class="secondary-btn">↺ RESET</button><button id="hint" class="secondary-btn">? SHOW HINT</button></div>
+          <div class="teaching-card"><span class="eyebrow">THE PHYSICS</span><p id="concept">A magnetic field bends the path of a moving charge.</p><div class="formula">r<sub>L</sub> = mv<sub>⊥</sub> / |q|B</div><small>The chamber uses illustrative units. Only the trajectory follows the ideal Lorentz-force model; it is not a full plasma simulation.</small></div>
+        </aside>
+      </div>
+      <section class="missions" aria-label="Mission selector"><div class="section-title"><span class="eyebrow">CHOOSE A MISSION</span><span>Complete all three to earn the FusionSim badge.</span></div><div id="level-list" class="level-list"></div></section>
+      <footer><span>DUNFS · Durham University Nuclear Fusion Society</span><span>Made for FusionSim · Source and teaching notes on GitHub</span></footer>
+    </main>
+  </div>
+</body>
+</html>
