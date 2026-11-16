@@ -8,13 +8,14 @@ const ctx = canvas.getContext('2d');
 const saved = (() => { try { return JSON.parse(localStorage.getItem('dunfs-magnetic-maze-v1') || '{}'); } catch { return {}; } })();
 const best = (saved && typeof saved === 'object') ? saved : {};
 let current = 0, attempts = 0, revealedHint = false, flight = null, activeFrame = 0, raf = null, startedAt = null;
+let fieldSign = 1; // On the final level, the on-screen ± buttons control B's sign. iOS decimal keyboards lack a minus key.
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function selected() { return LEVELS[current]; }
 function isCalculation() { return Boolean(selected().calculation); }
 function enteredNumber(id) { const raw = $(id).value.trim(); return raw === '' ? NaN : Number(raw); }
 function settings() {
-  if (isCalculation()) return { field: enteredNumber('field-entry'), speed: enteredNumber('speed-entry'), charge: selected().calculation.charge };
+  if (isCalculation()) return { field: fieldSign * enteredNumber('field-entry'), speed: enteredNumber('speed-entry'), charge: selected().calculation.charge };
   return { field: Number($('field').value), speed: Number($('speed').value), charge: Number($('charge').value) };
 }
 function validateSettings() {
@@ -27,6 +28,14 @@ function validateSettings() {
   return null;
 }
 function formatSigned(value, digits = 2) { return `${value >= 0 ? '+' : '−'}${Math.abs(value).toFixed(digits)}`; }
+function setFieldSign(sign) {
+  fieldSign = sign < 0 ? -1 : 1;
+  $('field-sign-plus').classList.toggle('active', fieldSign > 0);
+  $('field-sign-minus').classList.toggle('active', fieldSign < 0);
+  $('field-sign-plus').setAttribute('aria-pressed', String(fieldSign > 0));
+  $('field-sign-minus').setAttribute('aria-pressed', String(fieldSign < 0));
+  updateControls();
+}
 
 function drawGrid() {
   ctx.strokeStyle = '#2a2740'; ctx.lineWidth = 1;
@@ -94,12 +103,14 @@ function loadLevel(index) {
   const calc = isCalculation();
   $('calculation-card').hidden = !calc;
   $('field').hidden = calc; $('speed').hidden = calc;
+  $('signed-field-entry').hidden = !calc;
   $('field-entry').hidden = !calc; $('speed-entry').hidden = !calc;
   $('field-range-label').hidden = calc; $('speed-range-label').hidden = calc;
   $('field-value').hidden = calc; $('speed-value').hidden = calc;
   $('field-label').htmlFor = calc ? 'field-entry' : 'field';
   $('speed-label').htmlFor = calc ? 'speed-entry' : 'speed';
   $('field-entry').value = ''; $('speed-entry').value = '';
+  setFieldSign(1);
   $('charge').disabled = calc;
   $('fixed-charge-note').hidden = !calc;
   $('attempts').textContent='ATTEMPTS 0';$('hint').textContent='? SHOW HINT';$('canvas-status').textContent='READY TO LAUNCH';$('launch').disabled=false;
@@ -134,6 +145,8 @@ function launch() {
   else raf=requestAnimationFrame(animate);
 }
 for(const key of ['field','speed','charge','field-entry','speed-entry']) $(key).addEventListener('input',updateControls);
+$('field-sign-plus').addEventListener('click', () => setFieldSign(1));
+$('field-sign-minus').addEventListener('click', () => setFieldSign(-1));
 $('launch').addEventListener('click',launch);
 $('reset').addEventListener('click',()=>loadLevel(current));
 $('hint').addEventListener('click',()=>{revealedHint=true;$('hint').textContent='HINT SHOWN';message(`Hint: ${selected().hint}`);});

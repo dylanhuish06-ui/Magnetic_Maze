@@ -2,7 +2,7 @@
 
 A zero-dependency, phone-friendly browser game introducing students to **charged-particle motion in a magnetic field**. Built for Durham University Nuclear Fusion Society (DUNFS) Session 1.
 
-Three missions: **Find the orbit**, **Reactor pass**, and **Calculate the rescue**. The first two use interactive sliders for field strength and speed. **Mission 3 replaces both sliders with numerical input boxes**: students calculate launch speed from the supplied kinetic energy and signed magnetic field from the target's geometry before launching. Charge is fixed to +1 on the final stage.
+Three missions: **Find the orbit**, **Reactor pass**, and **Calculate the rescue**. The first two use interactive sliders for field strength and speed. **Mission 3 replaces both sliders with numerical input boxes**: students calculate launch speed from the supplied kinetic energy and signed magnetic field from the target's geometry before launching. **For the magnetic field, choose + or − using the dedicated buttons, then type the positive magnitude |B|.** This works on mobile decimal keypads that do not expose a minus key. Charge is fixed to +1 on the final stage.
 
 ## Run locally
 

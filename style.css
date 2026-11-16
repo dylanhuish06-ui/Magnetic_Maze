@@ -13,3 +13,12 @@
 .calculation-grid strong{display:block;font-size:13px;color:#89f0d4;margin-top:3px}
 .calculation-card .calc-note{font-size:11px}
 .working-formulas{border-top:1px solid #55456f;padding-top:10px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#eee5ff;font-size:12px;line-height:1.9}
+
+/* Explicit sign buttons: iPhone decimal keyboards do not provide a minus key. */
+.signed-field-entry{display:flex;align-items:stretch;gap:9px;min-width:0}
+.signed-field-entry .number-entry{flex:1;min-width:0;width:0}
+.field-sign-buttons{display:flex;align-items:stretch;gap:5px;flex:none}
+.field-sign{min-width:46px;min-height:52px;touch-action:manipulation;border:1px solid #8570aa;border-radius:9px;background:#18152a;color:#d9ceeb;font-size:23px;font-weight:700;line-height:1;transition:background .12s,border-color .12s}
+.field-sign.active,.field-sign[aria-pressed="true"]{border-color:#6ce8df;background:#345b61;color:#d2fff9;box-shadow:inset 0 0 0 1px #6ce8df}
+.field-sign:focus-visible{outline:2px solid #6ce8df;outline-offset:2px}
+@media(max-width:380px){.field-sign{min-width:40px}.signed-field-entry{gap:6px}}
